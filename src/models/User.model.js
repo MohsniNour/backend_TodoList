@@ -1,46 +1,157 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const { USERTOJSON, paginate } = require('./plugins');
+const { roles } = require('../config/roles');
 
-const userSchema = new Schema(
-    {
-        username: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        firstname: {
-            type: String,
-            required: true,
-            minlength: [3, "First Name Minimum 3 charachters."],
-        },
-        lastname: {
-            type: String,
-            required: true,
-            minlength: [3, "Last Name Minimum 3 charachters."],
-        },
-        mailAddress: {
-            type: String,
-            required: true,
-            unique: true,
-            match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, "Please fill a valid email address"],
-        },
-        password: {
-            type: String,
-            required: true,
-            minlength: [6, "Password Minimum 6 charachters."],
-        },
-        loginAttempts: { type: Number, required: true, default: 0 },
-        lockUntil: { type: Number },
-        roles: {
-            type : String,
-            enum : ['Simple User','Admin','Financial','Super Admin'],
-            default : 'Simple User'
-        }
+const userSchema = mongoose.Schema(
+  {
+    isConnected: {
+      type: Boolean,
     },
-    {
-        timestamps: true,
-    }
+    lastConnection: {
+      type: Date,
+    },
+    lastSocketId: {
+      type: String,
+    },
+    browserInfo: [{ type: String }],
+    status: {
+      confirmed: { type: Boolean, default: false },
+      blocked: { type: Boolean, default: false },
+      available: { type: Boolean, default: true },
+    },
+    avatar: {
+      type: String,
+    },
+    userName: {
+      type: String,
+      trim: true,
+      unique: true,
+      lowercase: true,
+      required: true,
+    },
+    firstName: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ['Male', 'Female'],
+    },
+    birthdate: {
+      type: Date,
+    },
+    email: {
+      type: String,
+      // unique: true,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email');
+        }
+      },
+    },
+    password: {
+      type: String,
+      trim: true,
+      minlength: 8,
+      validate(value) {
+        // if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
+        //   throw new Error('Password must contain at least one letter and one number');
+        // }
+        if (value.length <= 7) {
+          throw new Error('Password must be at least 8 characters');
+        }
+      },
+      private: true, // used by the toJSON plugin
+    },
+    role: {
+      type: String,
+      enum: roles,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+      match: /^\d{8}$/,
+    },
+    address: {
+      country: {
+        type: String,
+        default: 'Tunis',
+      },
+      governorates: {
+        type: String,
+      },
+      subdivision: {
+        type: String,
+      },
+      address: {
+        type: String,
+      },
+      postalCode: {
+        type: String,
+        match: /^\d{4}$/,
+      },
+    },
+    cin: {
+      type: Number,
+      match: /^\d{8}$/,
+    },
+    timestamps: true,
+  }
 );
 
-const User = mongoose.model("User", userSchema, "User");
+// add plugin that converts mongoose to json
+// @walid review USERTOJSON
+userSchema.plugin(USERTOJSON);
+userSchema.plugin(paginate);
+
+/**
+ * Check if email is taken
+ * @param {string} email - The user's email
+ * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
+ * @returns {Promise<boolean>}
+ */
+
+// Schema virtual fields
+
+userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
+  const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
+  return !!user;
+};
+userSchema.statics.isUserNameTaken = async function (userName, excludeUserId) {
+  const user = await this.findOne({ userName, _id: { $ne: excludeUserId } });
+  return !!user;
+};
+/**
+ * Check if password matches the user's password
+ * @param {string} password
+ * @returns {Promise<boolean>}
+ */
+userSchema.methods.isPasswordMatch = async function (password) {
+  const user = this;
+  return bcrypt.compare(password, user.password);
+};
+
+userSchema.pre('save', async function (next) {
+  const user = this;
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+  next();
+});
+
+/**
+ * @typedef User
+ */
+const User = mongoose.model('User', userSchema);
+
 module.exports = User;

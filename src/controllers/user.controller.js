@@ -1,7 +1,6 @@
 const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const catchAsync = require('../utils/catchAsync');
-const { errors } = require('../utils/errors.constant');
 const { userService } = require('../services');
 const { userNameCin } = require('../utils/searchPatterns');
 
