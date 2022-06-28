@@ -1,118 +1,69 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-const { USERTOJSON, paginate } = require('./plugins');
-const { roles } = require('../config/roles');
+// const { USERTOJSON, paginate } = require('./plugins');
+// const { roles } = require('../config/roles');
 
-const userSchema = mongoose.Schema(
-  {
-    isConnected: {
-      type: Boolean,
+const userSchema = mongoose.Schema({
+  userName: {
+    type: String,
+    trim: true,
+    unique: true,
+    lowercase: true,
+    required: true,
+  },
+  firstName: {
+    type: String,
+    trim: true,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    trim: true,
+    required: true,
+  },
+  gender: {
+    type: String,
+    enum: ['Male', 'Female'],
+  },
+  birthdate: {
+    type: Date,
+  },
+  email: {
+    type: String,
+    trim: true,
+    lowercase: true,
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error('Invalid email');
+      }
     },
-    lastConnection: {
-      type: Date,
+  },
+  password: {
+    type: String,
+    trim: true,
+    minlength: 8,
+    validate(value) {
+      if (value.length <= 7) {
+        throw new Error('Password must be at least 8 characters');
+      }
     },
-    lastSocketId: {
-      type: String,
-    },
-    browserInfo: [{ type: String }],
-    status: {
-      confirmed: { type: Boolean, default: false },
-      blocked: { type: Boolean, default: false },
-      available: { type: Boolean, default: true },
-    },
-    avatar: {
-      type: String,
-    },
-    userName: {
-      type: String,
-      trim: true,
-      unique: true,
-      lowercase: true,
-      required: true,
-    },
-    firstName: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    gender: {
-      type: String,
-      enum: ['Male', 'Female'],
-    },
-    birthdate: {
-      type: Date,
-    },
-    email: {
-      type: String,
-      // unique: true,
-      trim: true,
-      lowercase: true,
-      validate(value) {
-        if (!validator.isEmail(value)) {
-          throw new Error('Invalid email');
-        }
-      },
-    },
-    password: {
-      type: String,
-      trim: true,
-      minlength: 8,
-      validate(value) {
-        // if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
-        //   throw new Error('Password must contain at least one letter and one number');
-        // }
-        if (value.length <= 7) {
-          throw new Error('Password must be at least 8 characters');
-        }
-      },
-      private: true, // used by the toJSON plugin
-    },
-    role: {
-      type: String,
-      enum: roles,
-      required: true,
-    },
-    phoneNumber: {
-      type: String,
-      match: /^\d{8}$/,
-    },
-    address: {
-      country: {
-        type: String,
-        default: 'Tunis',
-      },
-      governorates: {
-        type: String,
-      },
-      subdivision: {
-        type: String,
-      },
-      address: {
-        type: String,
-      },
-      postalCode: {
-        type: String,
-        match: /^\d{4}$/,
-      },
-    },
-    cin: {
-      type: Number,
-      match: /^\d{8}$/,
-    },
-    timestamps: true,
-  }
-);
+    private: true, // used by the toJSON plugin
+  },
+  phoneNumber: {
+    type: String,
+    match: /^\d{8}$/,
+  },
+  cin: {
+    type: Number,
+    match: /^\d{8}$/,
+  },
+});
 
 // add plugin that converts mongoose to json
 // @walid review USERTOJSON
-userSchema.plugin(USERTOJSON);
-userSchema.plugin(paginate);
+// userSchema.plugin(USERTOJSON);
+// userSchema.plugin(paginate);
 
 /**
  * Check if email is taken

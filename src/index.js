@@ -4,13 +4,15 @@ const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
 
-// eslint-disable-next-line no-unused-vars
 let gfs;
 let server;
 
 mongoose
-  .connect(config.mongoose.url, config.mongoose.options)
-  // .connect('mongodb://inayaRW:SChubinaya2020%21@3.67.220.26:27117/?', config.mongoose.options)
+  // connect(config.mongoose.url, config.mongoose.options)
+  .connect(
+    'mongodb+srv://admin:admin@cluster0.p0unflv.mongodb.net/TodoList?retryWrites=true&w=majority',
+    config.mongoose.options
+  )
   .then(() => {
     logger.info('Connected to MongoDB');
     server = app.listen(config.port, () => {

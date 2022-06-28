@@ -10,7 +10,7 @@ const genUsername = require('../utils/genUsername');
  * @param {Object} userBody
  * @returns {Promise<User>}
  */
-//create user
+// create user
 const createUser = async (userBody) => {
   let exist = false;
   let userName;
@@ -42,7 +42,7 @@ const queryUsers = async (filter, options, select) => {
  * @param {ObjectId} id
  * @returns {Promise<User>}
  */
-//getUserById
+// getUserById
 const getUserById = async (id) => {
   const user = await User.findById(id);
   if (!user) {

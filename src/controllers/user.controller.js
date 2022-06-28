@@ -1,12 +1,12 @@
 const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const catchAsync = require('../utils/catchAsync');
-const { userService } = require('../services');
+const { userService } = require('../services/user.service');
 const { userNameCin } = require('../utils/searchPatterns');
 
 const addUser = catchAsync(async (req, res) => {
   try {
-    const user = await userService.createUser({ ...req.body, role: roles[3] });
+    const user = await userService.createUser({ ...req.body });
     res.status(httpStatus.CREATED).send(user);
   } catch (error) {
     res.status(error.statusCode || httpStatus.INTERNAL_SERVER_ERROR).json({
@@ -15,7 +15,7 @@ const addUser = catchAsync(async (req, res) => {
     });
   }
 });
-const userDetails= catchAsync(async (req, res) => {
+const userDetails = catchAsync(async (req, res) => {
   try {
     const user = await userService.getUserById(req.user._id);
     res.status(httpStatus.OK).send(user);
@@ -71,12 +71,10 @@ const updateUser = catchAsync(async (req, res) => {
     });
   }
 });
-
-
 module.exports = {
-    addUser,
-    userDetails,
-    getUsers,
-    deleteUser,
-    updateUser
+  addUser,
+  userDetails,
+  getUsers,
+  deleteUser,
+  updateUser,
 };
