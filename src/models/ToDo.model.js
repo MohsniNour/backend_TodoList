@@ -17,7 +17,7 @@ const ToDoSchema = new Schema({
     type: Date,
     required: true,
   },
-  EndDateEvent: {
+  endDate: {
     type: Date,
     required: true,
   },

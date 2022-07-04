@@ -6,8 +6,8 @@ const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const cors = require('cors');
-const tasksRouter = require('./routes');
-const usersRouter = require('./routes');
+const todoRouter = require('./routes/todo.route');
+const usersRouter = require('./routes/user.route');
 
 const app = express();
 
@@ -55,10 +55,12 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.static(`${__dirname}/public`));
 app.get('/', (req, res) => res.sendFile(path.join(`${__dirname}/index.html`)));
 
-app.use('/tasks', tasksRouter);
+// v1 api routes
+app.use('/todo', todoRouter);
 app.use('/users', usersRouter);
 
 // app.use('/v1/patients', limiterPatientSearching);

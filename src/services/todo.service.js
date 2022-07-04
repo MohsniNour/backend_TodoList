@@ -35,7 +35,7 @@ const getTaskById = async (id) => {
  * Get get All Tasks
  */
 const getTasks = async () => {
-  const tasks = Todo.findAll();
+  const tasks = Todo.find();
   return tasks;
 };
 

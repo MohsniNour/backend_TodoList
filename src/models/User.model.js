@@ -1,33 +1,12 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-// const { USERTOJSON, paginate } = require('./plugins');
-// const { roles } = require('../config/roles');
 
 const userSchema = mongoose.Schema({
-  userName: {
-    type: String,
-    trim: true,
-    unique: true,
-    lowercase: true,
-    required: true,
-  },
-  firstName: {
+  name: {
     type: String,
     trim: true,
     required: true,
-  },
-  lastName: {
-    type: String,
-    trim: true,
-    required: true,
-  },
-  gender: {
-    type: String,
-    enum: ['Male', 'Female'],
-  },
-  birthdate: {
-    type: Date,
   },
   email: {
     type: String,
@@ -42,7 +21,6 @@ const userSchema = mongoose.Schema({
   password: {
     type: String,
     trim: true,
-    minlength: 8,
     validate(value) {
       if (value.length <= 7) {
         throw new Error('Password must be at least 8 characters');
@@ -50,20 +28,7 @@ const userSchema = mongoose.Schema({
     },
     private: true, // used by the toJSON plugin
   },
-  phoneNumber: {
-    type: String,
-    match: /^\d{8}$/,
-  },
-  cin: {
-    type: Number,
-    match: /^\d{8}$/,
-  },
 });
-
-// add plugin that converts mongoose to json
-// @walid review USERTOJSON
-// userSchema.plugin(USERTOJSON);
-// userSchema.plugin(paginate);
 
 /**
  * Check if email is taken

@@ -4,9 +4,8 @@
  * @param {string} lName
  * @returns {String}
  */
- const genUsername = (fName, lName) => {
-    return `${fName}-${lName}-${Math.floor(Math.random() * 100)}`;
-  };
-  
-  module.exports = genUsername;
-  
+const genUsername = (fName, lName) => {
+  return `${fName}-${lName}-${Math.floor(Math.random() * 100)}`;
+};
+
+module.exports = genUsername;

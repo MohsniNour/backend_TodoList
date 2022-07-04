@@ -4,31 +4,30 @@ to keep it simple and clear
 */
 
 const userNameCin = (search) => {
-    const serachPattern = [
-      {
-        $expr: {
-          $regexMatch: {
-            input: { $concat: ['$firstName', ' ', '$lastName'] },
-            regex: search || '',
-            options: 'i',
-          },
+  const serachPattern = [
+    {
+      $expr: {
+        $regexMatch: {
+          input: { $concat: ['$firstName', ' ', '$lastName'] },
+          regex: search || '',
+          options: 'i',
         },
       },
-      {
-        $expr: {
-          $regexMatch: {
-            input: { $convert: { input: '$cin', to: 'string' } },
-            regex: search || '',
-            options: 'i',
-          },
+    },
+    {
+      $expr: {
+        $regexMatch: {
+          input: { $convert: { input: '$cin', to: 'string' } },
+          regex: search || '',
+          options: 'i',
         },
       },
-    ];
-  
-    return serachPattern;
-  };
-  
-  module.exports = {
-    userNameCin,
-  };
-  
+    },
+  ];
+
+  return serachPattern;
+};
+
+module.exports = {
+  userNameCin,
+};

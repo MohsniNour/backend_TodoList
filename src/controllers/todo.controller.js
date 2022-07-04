@@ -5,7 +5,7 @@ const { todoService } = require('../services');
 
 const createTodo = catchAsync(async (req, res) => {
   try {
-    const todo = await todoService.createTask({ ...req.body });
+    const todo = await todoService.createTodo({ ...req.body });
     res.status(httpStatus.CREATED).send(todo);
   } catch (error) {
     res.status(error.statusCode || httpStatus.INTERNAL_SERVER_ERROR).json({
@@ -29,7 +29,7 @@ const getTasks = catchAsync(async (req, res) => {
 
 const deleteTodo = catchAsync(async (req, res) => {
   try {
-    const deletedTodo = await todoService.deleteTask(req.params.id);
+    const deletedTodo = await todoService.deleteTodo(req.params.id);
     res.status(httpStatus.OK).send(deletedTodo);
   } catch (error) {
     res.status(error.statusCode || httpStatus.INTERNAL_SERVER_ERROR).json({
@@ -41,7 +41,20 @@ const deleteTodo = catchAsync(async (req, res) => {
 
 const updateTodo = catchAsync(async (req, res) => {
   try {
-    const todo = await todoService.updateTask(req.params.id, req.body);
+    const todo = await todoService.updateTodo(req.params.id, req.body);
+    res.send(todo);
+  } catch (error) {
+    res.status(error.statusCode || httpStatus.INTERNAL_SERVER_ERROR).json({
+      message: error.message,
+      error,
+    });
+  }
+});
+
+const getTaskById = catchAsync(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const todo = await todoService.getTaskById(id);
     res.send(todo);
   } catch (error) {
     res.status(error.statusCode || httpStatus.INTERNAL_SERVER_ERROR).json({
@@ -54,6 +67,7 @@ const updateTodo = catchAsync(async (req, res) => {
 module.exports = {
   createTodo,
   getTasks,
+  getTaskById,
   deleteTodo,
   updateTodo,
 };
