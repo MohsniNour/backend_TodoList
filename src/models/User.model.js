@@ -33,7 +33,7 @@ const userSchema = mongoose.Schema(
           throw new Error('Password must be at least 8 characters');
         }
       },
-      private: true, // used by the toJSON plugin
+      private: false, // used by the toJSON plugin
     },
   },
   {
