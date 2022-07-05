@@ -1,34 +1,50 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const { USERTOJSON, paginate } = require('./plugins');
 
-const userSchema = mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: true,
-  },
-  email: {
-    type: String,
-    trim: true,
-    lowercase: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error('Invalid email');
-      }
+const userSchema = mongoose.Schema(
+  {
+    userName: {
+      type: String,
+      required: true,
+    },
+
+    email: {
+      type: String,
+      // unique: true,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email');
+        }
+      },
+    },
+    password: {
+      type: String,
+      trim: true,
+      minlength: 8,
+      validate(value) {
+        // if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
+        //   throw new Error('Password must contain at least one letter and one number');
+        // }
+        if (value.length <= 7) {
+          throw new Error('Password must be at least 8 characters');
+        }
+      },
+      private: true, // used by the toJSON plugin
     },
   },
-  password: {
-    type: String,
-    trim: true,
-    validate(value) {
-      if (value.length <= 7) {
-        throw new Error('Password must be at least 8 characters');
-      }
-    },
-    private: true, // used by the toJSON plugin
-  },
-});
+  {
+    timestamps: true,
+  }
+);
+
+// add plugin that converts mongoose to json
+// @walid review USERTOJSON
+userSchema.plugin(USERTOJSON);
+userSchema.plugin(paginate);
 
 /**
  * Check if email is taken
