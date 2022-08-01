@@ -56,7 +56,7 @@ const login = catchAsync(async (req, res) => {
     const { userName, password } = req.body;
     const user = await authService.loginUserWithUserNameAndPassword(userName, password);
     const tokens = await tokenService.generateAuthTokens(user);
-    res.send({ tokens });
+    res.send({ user, tokens });
   } catch (error) {
     res.status(error.statusCode || httpStatus.INTERNAL_SERVER_ERROR).json({
       message: error.message,
